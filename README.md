@@ -81,6 +81,16 @@ Các Bước Cài Đặt
 
         .\.venv\Scripts\activate
 
+4. Cài đặt các thư viện:
+
+Sau khi đã cài xong PyTorch, hãy cài đặt các gói phụ thuộc khác từ file requirements.txt.
+code Bash
+
+    
+    pip install -r requirements.txt
+
+
+
   
 3. Cài đặt PyTorch (Bước Quan Trọng):
 
@@ -104,17 +114,6 @@ code Bash
         
     pip3 install torch torchvision
 
-      
-
-4. Cài đặt các thư viện còn lại:
-
-Sau khi đã cài xong PyTorch, hãy cài đặt các gói phụ thuộc khác từ file requirements.txt.
-code Bash
-
-    
-    pip install -r requirements.txt
-
-  
 
 
 5. Khởi Chạy Cơ Sở Dữ Liệu Vector Qdrant (Bước Bắt Buộc):
