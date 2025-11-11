@@ -114,11 +114,12 @@ Sau khi chạy lệnh, hãy mở trình duyệt và truy cập http://localhost:
 
 Hãy giữ cửa sổ Terminal này chạy trong suốt quá trình sử dụng ứng dụng.
 
+
 5. Cấu hình các biến môi trường:
 
-    Trong thư mục gốc, sao chép file example.env và đổi tên bản sao thành .env.
+Trong thư mục gốc, sao chép file example.env và đổi tên bản sao thành .env.
 
-    Mở file .env và điền đầy đủ các thông tin của bạn vào các trường còn trống:
+Mở file .env và điền đầy đủ các thông tin của bạn vào các trường còn trống:
 
         SENDER_EMAIL: Email bạn sẽ dùng để gửi báo cáo/cảnh báo.
 
@@ -128,7 +129,8 @@ Hãy giữ cửa sổ Terminal này chạy trong suốt quá trình sử dụng 
 
         GEMINI_API_KEY: API Key để sử dụng Gemini. Lấy tại Google AI Studio.
 
-5. Chạy Ứng Dụng:
+6. Chạy Ứng Dụng:
+
 Sau khi hoàn tất cài đặt, thực thi file Python chính (ví dụ main.py):
 
     
