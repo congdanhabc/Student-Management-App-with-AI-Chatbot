@@ -82,16 +82,42 @@ Các Bước Cài Đặt
         .\.venv\Scripts\activate
 
   
+3. Cài đặt PyTorch (Bước Quan Trọng):
 
-3. Cài đặt các thư viện cần thiết:
+Dự án yêu cầu PyTorch để chạy các mô hình AI. Hãy cài đặt phiên bản phù hợp với hệ thống của bạn.
 
-Sử dụng file requirements.txt đã được cung cấp để cài đặt tất cả các gói phụ thuộc.
+Lựa chọn A: Cài đặt cho GPU NVIDIA (Khuyến khích nếu có):
+    
+Mở terminal đã kích hoạt môi trường ảo và chạy lệnh sau. Lệnh này sẽ cài PyTorch với hỗ trợ CUDA 12.1.
 
+    
+    pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+
+  
+
+(Lưu ý: Bạn có thể truy cập trang chủ PyTorch để lấy lệnh cài đặt cho phiên bản CUDA khác nếu cần.)
+
+Lựa chọn B: Cài đặt chỉ cho CPU:
+Nếu máy bạn không có card đồ họa NVIDIA, hãy dùng lệnh sau:
+code Bash
+
+        
+    pip3 install torch torchvision
+
+      
+
+4. Cài đặt các thư viện còn lại:
+
+Sau khi đã cài xong PyTorch, hãy cài đặt các gói phụ thuộc khác từ file requirements.txt.
+code Bash
 
     
     pip install -r requirements.txt
 
-4. Khởi Chạy Cơ Sở Dữ Liệu Vector Qdrant (Bước Bắt Buộc):
+  
+
+
+5. Khởi Chạy Cơ Sở Dữ Liệu Vector Qdrant (Bước Bắt Buộc):
 
 Dự án sử dụng Qdrant để lưu trữ và truy vấn bộ nhớ cho chatbot. Bạn cần một instance Qdrant đang chạy trước khi khởi động ứng dụng.
 
@@ -115,7 +141,7 @@ Sau khi chạy lệnh, hãy mở trình duyệt và truy cập http://localhost:
 Hãy giữ cửa sổ Terminal này chạy trong suốt quá trình sử dụng ứng dụng.
 
 
-5. Cấu hình các biến môi trường:
+6. Cấu hình các biến môi trường:
 
 Trong thư mục gốc, sao chép file example.env và đổi tên bản sao thành .env.
 
@@ -129,7 +155,7 @@ Mở file .env và điền đầy đủ các thông tin của bạn vào các tr
 
         GEMINI_API_KEY: API Key để sử dụng Gemini. Lấy tại Google AI Studio.
 
-6. Chạy Ứng Dụng:
+7. Chạy Ứng Dụng:
 
 Sau khi hoàn tất cài đặt, thực thi file Python chính (ví dụ main.py):
 
