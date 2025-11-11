@@ -54,6 +54,7 @@ Thay vì thao tác thủ công, bạn có thể "trò chuyện" hoặc "ra lện
     Gửi Email: smtplib
 
 ⚙️ Hướng Dẫn Cài Đặt và Sử Dụng
+
 Yêu Cầu
 
     Python 3.10+ (Khuyến khích 3.12)
@@ -63,7 +64,7 @@ Yêu Cầu
 Các Bước Cài Đặt
 
 1. Tải dự án về máy:
-code Bash
+
 
 
     git clone https://github.com/congdanhabc/Student-Management-App-with-AI-Chatbot.git
@@ -71,7 +72,7 @@ code Bash
     cd Student-Management-App-with-AI-Chatbot
 
 2. Tạo và kích hoạt môi trường ảo:
-code Bash
+
 
     
     # Lệnh cho Windows
