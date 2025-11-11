@@ -14,7 +14,7 @@ class ManagerPage:
 
         for widget in self.content_frame.winfo_children():
             widget.destroy()
-        self.home_frame = tk.Frame(self.content_frame, bg="#1c1c1c")
+        self.home_frame = tk.Frame(self.content_frame, name="home_frame", bg="#1c1c1c")
         self.home_frame.pack(fill="both", expand=True, padx=10, pady=10)
         self.show_manager_page()
 
@@ -27,13 +27,13 @@ class ManagerPage:
         tk.Label(top_bar, text="Quản lý học vụ", bg="#2c2c2c", fg="white", font=("Arial", 14)).pack(side="left", padx=10)
 
         # Tạo khung cho các chức năng
-        self.function_frame = tk.Frame(self.home_frame, bg="#1c1c1c")
+        self.function_frame = tk.Frame(self.home_frame, name="function_frame", bg="#1c1c1c")
         self.function_frame.pack(pady=20)
 
         # Thêm các nút gửi mail       
-        tk.Button(self.function_frame, text="DS Sinh Viên chưa có Mail", bg="#2c2c2c", fg="white", font=("Arial", 12), width=20, command=lambda: self.show_students_missing_gmail()).grid(row=1, column=0, padx=10, pady=5)
-        tk.Button(self.function_frame, text="Gửi excel tổng hợp", bg="#2c2c2c", fg="white", font=("Arial", 12), width=20, command=lambda: self.send_excel()).grid(row=1, column=2, padx=10, pady=5)
-        tk.Button(self.function_frame, text="Gửi Email Hàng Loạt", bg="#2c2c2c", fg="white", font=("Arial", 12), width=20, command=lambda: self.send_bulk_emails()).grid(row=1, column=4, padx=10, pady=5)
+        tk.Button(self.function_frame, name="show_no_email", text="DS Sinh Viên chưa có Mail", bg="#2c2c2c", fg="white", font=("Arial", 12), width=20, command=lambda: self.show_students_missing_gmail()).grid(row=1, column=0, padx=10, pady=5)
+        tk.Button(self.function_frame, name="send_excel", text="Gửi excel tổng hợp", bg="#2c2c2c", fg="white", font=("Arial", 12), width=20, command=lambda: self.send_excel()).grid(row=1, column=2, padx=10, pady=5)
+        tk.Button(self.function_frame, name="send_email", text="Gửi Email Hàng Loạt", bg="#2c2c2c", fg="white", font=("Arial", 12), width=20, command=lambda: self.send_bulk_emails()).grid(row=1, column=4, padx=10, pady=5)
         # Khu vực hiển thị kết quả với Treeview
         result_frame = tk.Frame(self.home_frame, bg="#1c1c1c")
         result_frame.pack(fill="both", expand=True)

@@ -135,34 +135,38 @@ class HomePage:
 
     def add_student_dialog(self):
         # Tạo một cửa sổ hộp thoại mới
-        dialog = tk.Toplevel(self.content_frame)
+        dialog = tk.Toplevel(self.content_frame, name="add_student_dialog")
         dialog.title("Thêm Sinh Viên")
         dialog.geometry("+450+200")
-
+    
         # Nhãn và ô nhập mã sinh viên 
         tk.Label(dialog, text="Mã Sinh Viên:").grid(row=0, column=0, padx=10, pady=5) 
-        self.student_id_entry = tk.Entry(dialog) 
+        self.student_id_entry = tk.Entry(dialog, name="id") 
         self.student_id_entry.grid(row=0, column=1, padx=10, pady=5)
         
         # Nhãn và ô nhập họ tên
         tk.Label(dialog, text="Họ Tên:").grid(row=1, column=0, padx=10, pady=5)
-        self.name_entry = tk.Entry(dialog)
+        self.name_entry = tk.Entry(dialog, name="name")
         self.name_entry.grid(row=1, column=1, padx=10, pady=5)
         
         # Nhãn và ô chọn giới tính
         tk.Label(dialog, text="Giới Tính:").grid(row=2, column=0, padx=10, pady=5)
-        self.gender_entry = tk.StringVar(value="Nam")  # Giá trị mặc định
+        self.gender_entry = tk.StringVar(dialog ,value="Nam")  # Giá trị mặc định
         gender_options = ["Nam", "Nữ"]
         gender_menu = ttk.OptionMenu(dialog, self.gender_entry, self.gender_entry.get(), *gender_options)
         gender_menu.grid(row=2, column=1, padx=10, pady=5)
         
         # Nhãn và ô nhập ngày sinh
         tk.Label(dialog, text="Ngày Sinh (dd/mm/yyyy):").grid(row=3, column=0, padx=10, pady=5)
-        self.birthDay_entry = DateEntry(dialog, date_pattern="dd/MM/yyyy", mindate=date(1900, 1, 1), year=date.today().year, month=date.today().month, day=date.today().day)
+        self.birthDay_entry = tk.Entry(dialog, name="birth")
+        #DateEntry(dialog, name="birth", date_pattern="dd/MM/yyyy", mindate=date(1900, 1, 1), year=date.today().year, month=date.today().month, day=date.today().day)
         self.birthDay_entry.grid(row=3, column=1, padx=10, pady=5)
-        self.birthDay_entry.bind("<FocusOut>", lambda e: self.validate_date(self.birthDay_entry.get()))
+        # self.birthDay_entry.bind("<FocusOut>", lambda e: self.validate_date(self.birthDay_entry.get()))
 
-        tk.Button(dialog, text="Lưu", width=10, command=lambda: self.add_student()).grid(row=4, column=0, columnspan=2, pady=10)
+        tk.Button(dialog, name="save", text="Lưu", width=10, command=lambda: self.add_student()).grid(row=4, column=0, columnspan=2, pady=10)
+
+        tk.Button(dialog, name="gender_change", width=0, height=0, command=lambda: self.gender_entry.set("Nữ"), relief='flat', borderwidth=0).grid(row=5, column=0, columnspan=2, pady=10)
+
 
     def validate_date(self, default):
         try:

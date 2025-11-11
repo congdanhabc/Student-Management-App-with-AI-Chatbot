@@ -6,9 +6,12 @@ import google.generativeai as genai
 import google.ai.generativelanguage
 from controller.student import StudentController
 from controller.student_class import Student_ClassController
+import time
 
-# Set the OpenAI API key
-os.environ["GEMINI_API_KEY"] = "AIzaSyCjtdrGbA3pEWzQYoQo8xNKZrzZ-apNQN4"
+from dotenv import load_dotenv
+load_dotenv()
+# Set the GEMINI API key
+os.environ["GEMINI_API_KEY"] = os.getenv("GEMINI_API_KEY")
 
 class Chatbot:
     def __init__(self, root):
@@ -18,45 +21,59 @@ class Chatbot:
 
         # Khởi tạo Memory 
         self.config = {
-        "llm": {
-            "provider": "gemini",
-            "config": {
-                "model": "gemini-2.0-flash-exp",
-                "temperature": 0.1,
-                "max_tokens": 2000,
-                "api_key": os.environ["GEMINI_API_KEY"],
+            "llm": {
+                "provider": "gemini",
+                "config": {
+                    "model": "gemini-2.5-flash",
+                    "temperature": 0.2,
+                    "max_tokens": 2000,
+                    "top_p": 1.0
                 }
             },
-        "embedder": {
-            "provider": "gemini",
-            "config": {
-                "api_key": os.environ["GEMINI_API_KEY"],
-                "model": "models/text-embedding-004"
-            }
+            "embedder": {
+                "provider": "gemini",
+                "config": {
+                    "api_key": os.environ["GEMINI_API_KEY"],
+                    "model": "text-embedding-004", 
+                },
             },
-        "vector_store": {
-            "provider": "qdrant",
-            "config": {
-                "embedding_model_dims": 768,
-                "collection_name": "mem0",
-                "host": "localhost",
-                "port": 6333,
-                "on_disk": True,
-            }
+            "reranker": {
+                "provider": "huggingface",
+                "config": {
+                    "model": "BAAI/bge-reranker-large",
+                    "device": "cuda",
+                    "batch_size": 16,
+                    "max_length": 512,
+                    "trust_remote_code": False,
+                    "model_kwargs": {
+                        "torch_dtype": "float16"
+                    }
+                }
             },
-        "version": "v1.1",
+            "vector_store": {
+                "provider": "qdrant",
+                "config": {
+                    "collection_name": "mem0",
+                    "host": "localhost",
+                    "port": 6333,
+                    "on_disk": True,
+                },
+            },
         }
         self.memory = Memory.from_config(self.config)
         genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-        self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        self.model = genai.GenerativeModel('gemini-2.5-flash')
         # Define support context
         self.system_context = """
-        Bạn là là Nghĩa ngu, một trợ lý ảo giúp tôi trong việc quản lý sinh viên.
+        Bạn là là Nghĩa, một trợ lý ảo giúp tôi trong việc quản lý sinh viên.
         Dựa vào câu hỏi của tôi, bạn sẽ đưa ra một trong các lựa chọn sau:
         1. Thêm sinh viên: Chọn lựa chọn này khi tôi hỏi về việc thêm hoặc tạo mới một sinh viên.
         2. Xem sinh viên: Chọn lựa chọn này khi tôi hỏi về việc xem hoặc tìm kiếm một sinh viên đã có.
-        3. Khác: Chọn lựa chọn này cho các câu hỏi khác không thuộc hai lựa chọn trên.
-        Vui lòng trả lời bằng số thứ tự của lựa chọn (1, 2, hoặc 3) thôi nhé.
+        3. Hiển thị danh sách sinh viên chưa có email: chọn lựa chọn này khi tôi hỏi về việc xem danh sách sinh viên chưa có email
+        4. Gửi excel tổng hợp: chọn lựa chọn này khi tôi yêu cầu gửi file excel tổng hợp
+        5. Gửi email hàng loạt: chọn lựa chọn này khi tôi yêu cầu gửi email hàng loạt hoạt gửi email cảnh cáo những sinh viên đi học không đầy đủ
+        6. Khác: Chọn lựa chọn này cho các câu hỏi khác không thuộc các lựa chọn trên.
+        Vui lòng trả lời bằng số thứ tự của lựa chọn (1, 2, 3, 4, 5 hoặc 6) thôi nhé.
         """
 
 
@@ -109,17 +126,10 @@ class Chatbot:
     def add_student(self, query: str):
         existing_info = {}
         prompt_prefix = ''
-        # while True:
-        #     if len(existing_info) > 0:
-        #         prompt_prefix = f"Thông tin hiện có:\n"
-        #         for key, value in existing_info.items():
-        #             prompt_prefix += f"{key}: {value}\n"
-
         prompt = f"""
                 Bạn cần xác định các thông tin sau từ câu hỏi của tôi: Mã sinh viên, Họ tên, Giới tính, Ngày sinh của sinh viên.
                 Trả lời thông tin Mã sinh viên, Họ tên, Giới tính, Ngày sinh. Nếu thông tin nào thiếu thì hãy hỏi lại tôi
-                Sau khi có đủ thông tin, xác nhận lại thông tin người dùng.
-                Nếu người dùng xác nhận thông tin là chính xác, phản hồi lại như ví dụ bên dưới.
+                Nếu người dùng cung cấp thông tin đầy đủ, phản hồi lại như ví dụ bên dưới.
                 Ví dụ:
                 Mã sinh viên: 0533
                 Họ tên: Nguyễn Văn A
@@ -137,29 +147,44 @@ class Chatbot:
         if "dừng thêm sinh viên" in response_text.lower():
             return "Bạn đã dừng việc thêm sinh viên."
         if "Xác nhận thông tin: chính xác" in response_text:
-            try:                
-                ma_sinh_vien = response_text.split("\n")[0]
-                #.split("Mã sinh viên: ", "\n")[1]
-                # ho_ten = response_text.split("Tên sinh viên: ", "\n")
-                # gioi_tinh = response_text.split("Tên sinh viên: ", "\n")
-                # ngay_sinh = response_text.split("Ngày sinh: ")
-                button = self.root.nametowidget("content_frame").nametowidget("home_frame").nametowidget("function_frame").nametowidget("add_student")
-                button.invoke()
+            try:              
+                ma_sinh_vien = response_text.split("Mã sinh viên: ")[1]  
+                ma_sinh_vien = ma_sinh_vien.split("\n")[0]
+                ho_ten = response_text.split("Họ tên: ")[1]
+                ho_ten = ho_ten.split("\n")[0]
+                gioi_tinh = response_text.split("Giới tính: ")[1]
+                gioi_tinh = gioi_tinh.split("\n")[0]
+                ngay_sinh = response_text.split("Ngày sinh: ")[1]
+                ngay_sinh = ngay_sinh.split("\n")[0]
+
+                print(ma_sinh_vien, ho_ten, gioi_tinh, ngay_sinh)
+
+                content_frame = self.root.nametowidget("content_frame")
+                content_frame.nametowidget("home_frame").nametowidget("function_frame").nametowidget("add_student").invoke()
+
+                dialog = content_frame.nametowidget("add_student_dialog")
+                dialog.nametowidget("id").insert(0, ma_sinh_vien)
+                dialog.nametowidget("name").insert(0, ho_ten)
+                if gioi_tinh == "Nữ":
+                    dialog.nametowidget("gender_change").invoke()
+                dialog.nametowidget("birth").insert(0, ngay_sinh)
+                time.sleep(2)
+                dialog.nametowidget("save").invoke()
 
                 response_text = f"Đã thêm sinh viên có mã sinh viên: {ma_sinh_vien} thành công."
                 return response_text
             except Exception as e:
-                response_text = "Lỗi không xác định, thêm sinh viên không thành công." + e
+                response_text = "Lỗi không xác định, thêm sinh viên không thành công." + str(e)
                              
         return response_text
     def search_student(self, query: str, context: str):
         prompt = f"""
                 {context}
-                Bạn là là Nghĩa ngu, một trợ lý ảo thông minh. Bạn có khả năng ghi nhớ và sử dụng thông tin từ các cuộc trò chuyện trước đây. Nếu có câu hỏi nào về các thông tin từ cuộc trò chuyện của tôi và bạn trong quá khứ, hãy cung cấp cho tôi sự hỗ trợ tốt nhất.
+                Bạn là là Nghĩa, một trợ lý ảo thông minh. Bạn có khả năng ghi nhớ và sử dụng thông tin từ các cuộc trò chuyện trước đây. Nếu có câu hỏi nào về các thông tin từ cuộc trò chuyện của tôi và bạn trong quá khứ, hãy cung cấp cho tôi sự hỗ trợ tốt nhất.
 
                 Hãy xác định tên sinh viên, mã sinh viên được đề cập trong câu hỏi của tôi
-                Nếu trong câu hỏi đã có mã sinh viên, trả về cách tìm kiếm là "tìm kiếm theo mã" và mã sinh viên.
-                Nếu trong câu hỏi đã có tên sinh viên, trả về cách tìm kiếm là "tìm kiếm theo tên" và tên sinh viên.
+                Nếu trong câu hỏi đã có mã sinh viên, trả về cách tìm kiếm là "tìm kiếm theo mã" và "Mã sinh viên: " + mã sinh viên.
+                Nếu trong câu hỏi đã có tên sinh viên, trả về cách tìm kiếm là "tìm kiếm theo tên" và "Tên sinh viên: " + tên sinh viên.
                 Nếu trong câu hỏi chưa có tên sinh viên hoặc mã sinh viên, bạn cần yêu cầu tôi cung cấp tên hoặc mã sinh viên.
 
                 Câu hỏi: {query}
@@ -181,8 +206,8 @@ class Chatbot:
                         response_text = "Không tìm thấy sinh viên nào có tên này."
                 else:
                     response_text = "Bạn muốn tìm sinh viên bằng tên hay mã số?"
-            except:
-                response_text = "Có lỗi khi tìm sinh viên"
+            except Exception as e:
+                response_text = "Có lỗi khi tìm sinh viên" + str(e)
         elif "tìm kiếm theo mã" in response_text.lower():
             try:
                 # Improved extraction: split by "tên:" and get the LAST part (handling extra text)
@@ -195,8 +220,8 @@ class Chatbot:
                         response_text = "Không tìm thấy sinh viên với mã số này."
                 else:
                     response_text = "Bạn muốn tìm sinh viên bằng tên hay mã số?"
-            except:
-                response_text = "Có lỗi khi tìm sinh viên"
+            except Exception as e:
+                response_text = "Có lỗi khi tìm sinh viên" + str(e)
         return response_text
 
     def search_student_by_name(self, name: str) -> List[Dict]:
@@ -223,15 +248,30 @@ class Chatbot:
         option = self.classify_user_query(query)
 
         # Prepare prompt and generate response
+        response_text = "Tôi đã thực hiện yêu cầu của bạn. Bànj còn muốn tôi giúp gì không ?"
         if option == "1": # Add student
             response_text = self.add_student(query)
 
         elif option == "2": # Find student
             response_text = self.search_student(query, context)
+            
+        elif option == "3":
+            self.root.nametowidget("side_bar").nametowidget("manager").invoke()
+            content_frame = self.root.nametowidget("content_frame")
+            content_frame.nametowidget("home_frame").nametowidget("function_frame").nametowidget("show_no_email").invoke()       
+
+        elif option == "4":
+            self.root.nametowidget("side_bar").nametowidget("manager").invoke()
+            content_frame = self.root.nametowidget("content_frame")
+            content_frame.nametowidget("home_frame").nametowidget("function_frame").nametowidget("send_excel").invoke()
+        elif option == "5":
+            self.root.nametowidget("side_bar").nametowidget("manager").invoke()
+            content_frame = self.root.nametowidget("content_frame")
+            content_frame.nametowidget("home_frame").nametowidget("function_frame").nametowidget("send_email").invoke()
         else: # option is "3" (other)
             prompt = f"""
             {context}
-            Bạn là là Nghĩa ngu, một trợ lý ảo thông minh. Bạn có khả năng ghi nhớ và sử dụng thông tin từ các cuộc trò chuyện trước đây để cung cấp cho tôi sự hỗ trợ tốt nhất.
+            Bạn là là Nghĩa, một trợ lý ảo thông minh. Bạn có khả năng ghi nhớ và sử dụng thông tin từ các cuộc trò chuyện trước đây để cung cấp cho tôi sự hỗ trợ tốt nhất.
             {query}
             """
             response = self.model.generate_content(prompt)

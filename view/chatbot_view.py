@@ -44,14 +44,14 @@ class ChatbotView:
         self.message_entry.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=(0,10))
         
         # Nút micro
-        mic_icon = Image.open("assets/mic.png")
-        mic_icon = mic_icon.resize((25, 25), Image.LANCZOS)
-        self.mic_icon = ImageTk.PhotoImage(mic_icon)
-        
-        mic_button = tk.Button(input_frame, image=self.mic_icon, 
-                               command=self.start_speech_recognition, 
-                               bd=0)
-        mic_button.pack(side=tk.RIGHT)
+        # mic_icon = Image.open("assets/mic.png")
+        # mic_icon = mic_icon.resize((25, 25), Image.LANCZOS)
+        # self.mic_icon = ImageTk.PhotoImage(mic_icon)
+        # 
+        # mic_button = tk.Button(input_frame, image=self.mic_icon, 
+        #                        command=self.start_speech_recognition, 
+        #                        bd=0)
+        # mic_button.pack(side=tk.RIGHT)
         
         # Nút gửi
         send_button = tk.Button(input_frame, text="Gửi", command=self.send_message)
@@ -71,7 +71,7 @@ class ChatbotView:
         text = None
         while text is None:
             text = transcribe_audio()
-        self.message_entry.insert(tk.END, text)
+        self.message_entry.insert(tk.END, " " + text)
     
     def update_chat_display(self, message):
         self.chat_display.configure(state='normal')

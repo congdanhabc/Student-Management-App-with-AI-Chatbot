@@ -3,7 +3,6 @@ from view.manager_page import ManagerPage
 from PIL import Image, ImageTk
 import tkinter as tk
 from tkinter import messagebox
-from controller.speech_controller import recognize_speech, VoiceRecognitionWindow
 
 class Dashboard:
     def __init__(self):
@@ -51,7 +50,7 @@ class Dashboard:
 
     def create_sidebar(self):
         colors = self.get_current_theme()
-        self.sidebar = tk.Frame(self.root, bg=colors["sidebar_bg"], width=200)
+        self.sidebar = tk.Frame(self.root, name="side_bar", bg=colors["sidebar_bg"], width=200)
         self.sidebar.pack(side="left", fill="y")
 
         tk.Label(
@@ -62,17 +61,18 @@ class Dashboard:
             font=("Arial", 16)
         ).pack(pady=20)
 
-        nav_items = {"Trang chủ": self.home_page, "Quản lý học vụ": self.manager_page}
-        for item, command in nav_items.items():
+        nav_items = {"Trang chủ": ["home", self.home_page], "Quản lý học vụ": ["manager", self.manager_page]}
+        for item, value in nav_items.items():
             tk.Button(
                 self.sidebar, 
+                name=value[0],
                 text=item, 
                 bg=colors["button_bg"], 
                 fg=colors["fg"], 
                 font=("Arial", 12), 
                 width=30, 
                 height=2, 
-                command=command
+                command=value[1]
             ).pack(fill="x", pady=5)
 
 
@@ -95,19 +95,19 @@ class Dashboard:
         )
         self.settings_button.pack(side="left", padx=10)
 
-        # Tải và chuẩn bị icon micro
-        micro_icon = Image.open("assets/mic.png")
-        micro_icon = micro_icon.resize((30, 30), Image.LANCZOS)
-        self.micro_icon = ImageTk.PhotoImage(micro_icon)
+        # # Tải và chuẩn bị icon micro
+        # micro_icon = Image.open("assets/mic.png")
+        # micro_icon = micro_icon.resize((30, 30), Image.LANCZOS)
+        # self.micro_icon = ImageTk.PhotoImage(micro_icon)
 
-        self.micro_button = tk.Button(
-            settings_frame,
-            image=self.micro_icon,
-            bg=colors["sidebar_bg"],
-            bd=0,
-            command=self.open_voice_recognition
-        )
-        self.micro_button.pack(side="left", padx=10)
+        # self.micro_button = tk.Button(
+        #     settings_frame,
+        #     image=self.micro_icon,
+        #     bg=colors["sidebar_bg"],
+        #     bd=0,
+        #     command=self.open_voice_recognition
+        # )
+        # self.micro_button.pack(side="left", padx=10)
 
     def show_settings_menu(self):
         settings_menu = tk.Menu(self.root, tearoff=0)
@@ -265,6 +265,3 @@ class Dashboard:
         for widget in self.content_frame.winfo_children():
             widget.destroy()
         self.current_page = ManagerPage(self.content_frame)
-
-    def open_voice_recognition(self):
-        self.voice_window = VoiceRecognitionWindow(self)

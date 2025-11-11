@@ -11,10 +11,13 @@ from queue import Queue
 import time
 import re
 
+from dotenv import load_dotenv
+load_dotenv()
+
 class EmailSender:
     def __init__(self):
-        self.sender_email = "cd5112003@gmail.com"
-        self.sender_password = "bnzn mgdp icbb cjyy"
+        self.sender_email = os.getenv("SENDER_EMAIL")
+        self.sender_password = os.getenv("SENDER_APP_PASSWORD")
         self.email_queue = Queue()
         self.worker_thread = threading.Thread(target=self._process_email_queue, daemon=True)
         self.worker_thread.start()
@@ -115,17 +118,14 @@ class AbsenteeManager:
         df = pd.DataFrame(filtered_data)
         file_path = 'bao_cao_vang.xlsx'
         df.to_excel(file_path, index=False)
-        
+
+        manager_email = os.getenv("MANAGER_EMAIL")
         self.email_sender.send_email(
-            "abcxyz544000@gmail.com",
+            manager_email,
             "Thông tin chuyên cần của sinh viên",
             "Danh sách thông tin của các sinh viên về việc chuyên cần.",
             file_path
         )
-
-        # Xóa file sau khi đã gửi
-        if os.path.exists(file_path):
-            os.remove(file_path)
 
     def is_valid_email(self, email):
         """
