@@ -66,10 +66,10 @@ Các Bước Cài Đặt
 1. Tải dự án về máy:
 
 
-
     git clone https://github.com/congdanhabc/Student-Management-App-with-AI-Chatbot.git
 
     cd Student-Management-App-with-AI-Chatbot
+
 
 2. Tạo và kích hoạt môi trường ảo:
 
