@@ -77,9 +77,9 @@ Các Bước Cài Đặt
     
     # Lệnh cho Windows
 
-    python -m venv .venv
+        python -m venv .venv
 
-    .\.venv\Scripts\activate
+        .\.venv\Scripts\activate
 
   
 
