@@ -89,10 +89,30 @@ code Bash
     
     pip install -r requirements.txt
 
+4. Khởi Chạy Cơ Sở Dữ Liệu Vector Qdrant (Bước Bắt Buộc):
+
+Dự án sử dụng Qdrant để lưu trữ và truy vấn bộ nhớ cho chatbot. Bạn cần một instance Qdrant đang chạy trước khi khởi động ứng dụng.
+
+Đảm bảo Docker Desktop đang chạy trên máy bạn.
+
+Mở một cửa sổ Terminal/Command Prompt mới và riêng biệt.
+
+Chạy lệnh sau để khởi động Qdrant:
+
+    
+    docker run -p 6333:6333 -p 6334:6334 -v "%cd%/qdrant_storage":/qdrant/storage qdrant/qdrant
+
   
 
-4. Cấu hình các biến môi trường:
-Dự án cần các thông tin nhạy cảm để hoạt động.
+Lệnh này sẽ tự động tải và chạy Qdrant.
+
+Nó cũng sẽ tạo một thư mục qdrant_storage trong dự án của bạn để lưu trữ dữ liệu, đảm bảo bạn không bị mất bộ nhớ của chatbot mỗi khi khởi động lại.
+
+Sau khi chạy lệnh, hãy mở trình duyệt và truy cập http://localhost:6333. Nếu bạn thấy giao diện web của Qdrant, bạn đã thành công!
+
+Hãy giữ cửa sổ Terminal này chạy trong suốt quá trình sử dụng ứng dụng.
+
+5. Cấu hình các biến môi trường:
 
     Trong thư mục gốc, sao chép file example.env và đổi tên bản sao thành .env.
 
@@ -108,7 +128,6 @@ Dự án cần các thông tin nhạy cảm để hoạt động.
 
 5. Chạy Ứng Dụng:
 Sau khi hoàn tất cài đặt, thực thi file Python chính (ví dụ main.py):
-code Bash
 
     
     python main.py
