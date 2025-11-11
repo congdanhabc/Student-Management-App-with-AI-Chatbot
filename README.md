@@ -66,9 +66,9 @@ Các Bước Cài Đặt
 1. Tải dự án về máy:
 
 
-    git clone https://github.com/congdanhabc/Student-Management-App-with-AI-Chatbot.git
+        git clone https://github.com/congdanhabc/Student-Management-App-with-AI-Chatbot.git
 
-    cd Student-Management-App-with-AI-Chatbot
+        cd Student-Management-App-with-AI-Chatbot
 
 
 2. Tạo và kích hoạt môi trường ảo:
@@ -78,6 +78,7 @@ Các Bước Cài Đặt
     # Lệnh cho Windows
 
     python -m venv .venv
+
     .\.venv\Scripts\activate
 
   
@@ -85,7 +86,7 @@ Các Bước Cài Đặt
 3. Cài đặt các thư viện cần thiết:
 
 Sử dụng file requirements.txt đã được cung cấp để cài đặt tất cả các gói phụ thuộc.
-code Bash
+
 
     
     pip install -r requirements.txt
