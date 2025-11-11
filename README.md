@@ -81,7 +81,7 @@ Các Bước Cài Đặt
 
         .\.venv\Scripts\activate
 
-4. Cài đặt các thư viện:
+3. Cài đặt các thư viện:
 
 Sau khi đã cài xong PyTorch, hãy cài đặt các gói phụ thuộc khác từ file requirements.txt.
 code Bash
@@ -92,7 +92,7 @@ code Bash
 
 
   
-3. Cài đặt PyTorch (Bước Quan Trọng):
+4. Cài đặt PyTorch (Bước Quan Trọng):
 
 Dự án yêu cầu PyTorch để chạy các mô hình AI. Hãy cài đặt phiên bản phù hợp với hệ thống của bạn.
 
